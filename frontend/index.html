@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LeetCode AI Assistant</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>🤖 LeetCode AI Assistant</h1>
+            <p>Your personal coding companion</p>
+        </header>
+
+        <main>
+
+            <section class="problem-section">
+
+                <h2>Problem</h2>
+
+               <textarea
+                    id="problemInput"
+                    placeholder="Paste your LeetCode problem here...">
+                </textarea>
+
+            </section>
+
+
+            <section class="code-section">
+
+            <div class="code-header">
+
+                <h2>Your Code</h2>
+
+                <select id="languageSelect">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="c">C</option>
+                    <option value="cpp">C++</option>
+                    <option value="java">Java</option>
+                </select>
+
+            </div>
+
+            <div id="editor"></div>
+
+        </section>
+
+
+            <section class="actions">
+
+                <button id="hintBtn" onclick="getHint()">💡 Hint</button>
+
+                <button id="explainBtn">📖 Explain</button>
+
+                <button id="debugBtn">🐛 Debug</button>
+
+                <button id="optimizeBtn">⚡ Optimize</button>
+
+            </section>
+
+
+           <section class="ai-section">
+
+    <h2>🤖 AI Response</h2>
+
+    <div id="aiResponse">
+
+        <h3>🤖 AI Assistant</h3>
+
+        <p id="aiMessage">
+            Your AI response will appear here.
+        </p>
+
+    </div>
+
+</section>
+
+        </main>
+
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
