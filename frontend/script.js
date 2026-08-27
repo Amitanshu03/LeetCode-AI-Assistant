@@ -1,6 +1,7 @@
 let editor;
 
-let languageSelect = document.getElementById("languageSelect");
+let languageSelect =
+    document.getElementById("languageSelect");
 
 
 // ==========================================
@@ -8,28 +9,40 @@ let languageSelect = document.getElementById("languageSelect");
 // ==========================================
 
 require.config({
+
     paths: {
+
         vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs"
+
     }
+
 });
 
 
 require(["vs/editor/editor.main"], function () {
 
     editor = monaco.editor.create(
+
         document.getElementById("editor"),
+
         {
+
             value: `// Write your code here
 
 function twoSum(nums, target) {
 
 }`,
+
             language: "javascript",
+
             theme: "vs-dark",
+
             fontSize: 15,
 
             minimap: {
+
                 enabled: false
+
             },
 
             scrollBeyondLastLine: false,
@@ -37,107 +50,552 @@ function twoSum(nums, target) {
             automaticLayout: true,
 
             wordWrap: "on"
+
         }
+
     );
 
 
-    // ==========================================
     // LANGUAGE SELECTOR
-    // ==========================================
 
-    languageSelect.addEventListener("change", function () {
+    languageSelect.addEventListener(
+        "change",
+        function () {
 
-        let selectedLanguage = languageSelect.value;
+            let selectedLanguage =
+                languageSelect.value;
 
-        monaco.editor.setModelLanguage(
-            editor.getModel(),
-            selectedLanguage
-        );
 
-    });
+            monaco.editor.setModelLanguage(
+
+                editor.getModel(),
+
+                selectedLanguage
+
+            );
+
+        }
+    );
 
 });
 
 
 // ==========================================
-// GET AI HINT
+// HINT
 // ==========================================
 
 async function getHint() {
 
-    // Get problem from textarea
     const problem =
-        document.getElementById("problemInput").value;
+        document.getElementById(
+            "problemInput"
+        ).value;
 
 
-    // Check if problem is empty
     if (!problem.trim()) {
 
-        document.getElementById("aiMessage").textContent =
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
             "⚠️ Please enter a LeetCode problem first.";
 
         return;
+
     }
 
 
-    // Get code from Monaco editor
     const code = editor.getValue();
 
 
     try {
 
-        // Show loading message
-        document.getElementById("aiMessage").textContent =
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
             "🤖 Thinking...";
 
 
-        // Send request to backend
         const response = await fetch(
+
             "http://localhost:5000/api/hint",
+
             {
+
                 method: "POST",
 
                 headers: {
-                    "Content-Type": "application/json"
+
+                    "Content-Type":
+                        "application/json"
+
                 },
 
                 body: JSON.stringify({
+
                     problem: problem,
+
                     code: code
+
                 })
+
             }
+
         );
 
 
-        // Convert response to JSON
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
-        // Show response in browser console
-        console.log("AI Response:", data);
+        console.log(
+            "AI Response:",
+            data
+        );
 
 
-        // Check for backend error
         if (!response.ok) {
 
-            document.getElementById("aiMessage").textContent =
-                "❌ " + (data.error || "Something went wrong.");
+            document.getElementById(
+                "aiMessage"
+            ).textContent =
+                "❌ " +
+                (
+                    data.error ||
+                    "Something went wrong."
+                );
 
             return;
+
         }
 
 
-        // Display Gemini response
-        document.getElementById("aiMessage").textContent =
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
             data.reply;
 
 
-    } catch (error) {
+    }
 
-        console.error("Error:", error);
+    catch (error) {
+
+        console.error(
+            "Hint Error:",
+            error
+        );
 
 
-        document.getElementById("aiMessage").textContent =
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "❌ Failed to connect to the AI server.";
+
+    }
+
+}
+
+
+// ==========================================
+// DEBUG
+// ==========================================
+
+async function debugCode() {
+
+    const problem =
+        document.getElementById(
+            "problemInput"
+        ).value;
+
+
+    const code =
+        editor.getValue();
+
+
+    const language =
+        document.getElementById(
+            "languageSelect"
+        ).value;
+
+
+    if (!problem.trim()) {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "⚠️ Please enter a LeetCode problem first.";
+
+        return;
+
+    }
+
+
+    if (!code.trim()) {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "⚠️ Please write some code first.";
+
+        return;
+
+    }
+
+
+    try {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "🐛 Analyzing your code...";
+
+
+        const response = await fetch(
+
+            "http://localhost:5000/api/debug",
+
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    problem: problem,
+
+                    code: code,
+
+                    language: language
+
+                })
+
+            }
+
+        );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Debug Response:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            document.getElementById(
+                "aiMessage"
+            ).textContent =
+                "❌ " +
+                (
+                    data.error ||
+                    "Debugging failed."
+                );
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            data.reply;
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Debug Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "❌ Failed to connect to the AI server.";
+
+    }
+
+}
+
+
+// ==========================================
+// EXPLAIN
+// ==========================================
+
+async function explainCode() {
+
+    const problem =
+        document.getElementById(
+            "problemInput"
+        ).value;
+
+
+    const code =
+        editor.getValue();
+
+
+    const language =
+        document.getElementById(
+            "languageSelect"
+        ).value;
+
+
+    if (!problem.trim()) {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "⚠️ Please enter a LeetCode problem first.";
+
+        return;
+
+    }
+
+
+    if (!code.trim()) {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "⚠️ Please write some code first.";
+
+        return;
+
+    }
+
+
+    try {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "📖 Explaining your code...";
+
+
+        const response = await fetch(
+
+            "http://localhost:5000/api/explain",
+
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    problem: problem,
+
+                    code: code,
+
+                    language: language
+
+                })
+
+            }
+
+        );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Explain Response:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            document.getElementById(
+                "aiMessage"
+            ).textContent =
+                "❌ " +
+                (
+                    data.error ||
+                    "Explanation failed."
+                );
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            data.reply;
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Explain Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "❌ Failed to connect to the AI server.";
+
+    }
+
+}
+
+
+// ==========================================
+// OPTIMIZE
+// ==========================================
+
+async function optimizeCode() {
+
+    const problem =
+        document.getElementById(
+            "problemInput"
+        ).value;
+
+
+    const code =
+        editor.getValue();
+
+
+    const language =
+        document.getElementById(
+            "languageSelect"
+        ).value;
+
+
+    if (!problem.trim()) {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "⚠️ Please enter a LeetCode problem first.";
+
+        return;
+
+    }
+
+
+    if (!code.trim()) {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "⚠️ Please write some code first.";
+
+        return;
+
+    }
+
+
+    try {
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            "⚡ Analyzing your code for optimization...";
+
+
+        const response = await fetch(
+
+            "http://localhost:5000/api/optimize",
+
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    problem: problem,
+
+                    code: code,
+
+                    language: language
+
+                })
+
+            }
+
+        );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Optimize Response:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            document.getElementById(
+                "aiMessage"
+            ).textContent =
+                "❌ " +
+                (
+                    data.error ||
+                    "Optimization failed."
+                );
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
+            data.reply;
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Optimize Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "aiMessage"
+        ).textContent =
             "❌ Failed to connect to the AI server.";
 
     }
