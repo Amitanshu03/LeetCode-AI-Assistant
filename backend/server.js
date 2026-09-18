@@ -256,6 +256,58 @@ Do not provide a completely rewritten solution unless necessary.
 
 });
 
+app.post("/api/testcases", async (req, res) => {
+    try {
+        const { problem, language } = req.body;
+
+        const prompt = `
+You are an expert programming problem setter.
+
+Generate useful test cases for the following LeetCode problem.
+
+Problem:
+${problem}
+
+Programming Language:
+${language}
+
+Generate:
+1. Normal test cases
+2. Edge cases
+3. Boundary cases
+
+For each test case provide:
+- Test Case number
+- Input
+- Expected Output
+- Short explanation
+
+Do not provide solution code.
+Focus only on test cases.
+`;
+
+        const response = await ai.models.generateContent({
+            model: "gemini-3.5-flash-lite",
+            contents: prompt
+        });
+
+        const text = response.text;
+
+        res.json({
+            success: true,
+            response: text
+        });
+
+    } catch (error) {
+        console.error("Test case generation error:", error);
+
+        res.status(500).json({
+            success: false,
+            error: "Failed to generate test cases"
+        });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
 

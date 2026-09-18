@@ -601,3 +601,41 @@ async function optimizeCode() {
     }
 
 }
+
+async function generateTestCases() {
+    const problem = document.getElementById("problemInput").value;
+    const language = document.getElementById("languageSelect").value;
+    const aiMessage = document.getElementById("aiMessage");
+
+    if (!problem.trim()) {
+        aiMessage.textContent = "Please enter a LeetCode problem first.";
+        return;
+    }
+
+    aiMessage.textContent = "🧪 Generating test cases...";
+
+    try {
+        const response = await fetch("http://localhost:5000/api/testcases", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                problem: problem,
+                language: language
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            aiMessage.textContent = data.response;
+        } else {
+            aiMessage.textContent = "❌ Failed to generate test cases.";
+        }
+
+    } catch (error) {
+        console.error(error);
+        aiMessage.textContent = "❌ Server error. Make sure the backend is running.";
+    }
+}
