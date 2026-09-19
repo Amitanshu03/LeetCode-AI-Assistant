@@ -629,7 +629,7 @@ async function generateTestCases() {
         const data = await response.json();
 
         if (data.success) {
-            aiMessage.textContent = data.response;
+            aiMessage.innerHTML = formatAIResponse(data.response);
         } else {
             aiMessage.textContent = "❌ Failed to generate test cases.";
         }
@@ -638,4 +638,31 @@ async function generateTestCases() {
         console.error(error);
         aiMessage.textContent = "❌ Server error. Make sure the backend is running.";
     }
+}
+
+
+function formatAIResponse(text) {
+    return text
+        // Headings
+        .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+        .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+        .replace(/^# (.+)$/gm, "<h1>$1</h1>")
+
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+
+        // Inline code
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+
+        // Bullet points
+        .replace(/^\s*[-*] (.+)$/gm, "<li>$1</li>")
+
+        // Numbered lists
+        .replace(/^\s*(\d+)\.\s+(.+)$/gm, "<li>$2</li>")
+
+        // Horizontal line
+        .replace(/^---+$/gm, "<hr>")
+
+        // New lines
+        .replace(/\n/g, "<br>");
 }
